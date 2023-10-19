@@ -123,7 +123,7 @@ class Niiso {
 				[this](const std::vector<std::string>& args) {
 					std::string msg("");
 					for (int a=1; a<(int)args.size(); a++) {
-						if (args[a].at(0) == '!') {
+						if (args[a].at(0) == '!' || args[a].at(0) == '^') {
 							_send("xd");
 							return;
 						}
