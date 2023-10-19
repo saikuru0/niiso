@@ -9,9 +9,13 @@ namespace sockchat {
 		std::vector<std::string> parts;
 		std::istringstream iss(input);
 		std::string part;
+		char prev = '\0';
 
 		while (std::getline(iss, part, delim)) {
-			parts.push_back(part);
+			if (!(part.empty() && prev == delim)) {
+				parts.push_back(part);
+			}
+			prev = delim;
 		}
 
 		return parts;
