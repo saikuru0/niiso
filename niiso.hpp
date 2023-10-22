@@ -98,7 +98,17 @@ class Niiso {
 							_send("how many 'd's did you use");
 							return;
 						}
-						int nums[2] = { std::stoi(dice[0]), std::stoi(dice[1]) };
+						try {
+							int nums[2] = { std::stoi(dice[0]), std::stoi(dice[1]) };
+						}
+						catch (const std::exception&) {
+							_send("how uhh... how many sides is that");
+							return;
+						}
+						if (nums[0] > 1000) {
+							_send("do you have a fucking 2k monitor set up vertically");
+							return;
+						}
 						if (nums[0] < 1 || nums[1] < 1) {
 							_send("how am i supposed to roll that");
 							return;
