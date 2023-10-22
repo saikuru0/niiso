@@ -98,8 +98,10 @@ class Niiso {
 							_send("how many 'd's did you use");
 							return;
 						}
+						int nums[2];
 						try {
-							int nums[2] = { std::stoi(dice[0]), std::stoi(dice[1]) };
+							nums[0] = std::stoi(dice[0]);
+							nums[1] = std::stoi(dice[1]);
 						}
 						catch (const std::exception&) {
 							_send("how uhh... how many sides is that");
