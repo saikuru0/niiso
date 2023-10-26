@@ -186,7 +186,7 @@ class Niiso {
 				switch(std::stoi(parts[0])) {
 					// TODO: rest of the packets lol
 					case 1:
-						out = ""
+						out = "";
 						if ((parts[1] == "y" && parts[1] == "n") && we_ball(3)) {
 							if (we_ball(2)) out += "helo ";
 							out += parts[3];
