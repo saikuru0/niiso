@@ -186,7 +186,7 @@ class Niiso {
 					// TODO: rest of the packets lol
 					case 1:
 						if (parts[1] == "y" || parts[1] == "n") { break; }
-						std::string msg = "";
+						std::string msg("");
 						if (we_ball(3)) {
 							if (we_ball(2)) msg += "helo ";
 							msg += parts[3];
