@@ -187,10 +187,10 @@ class Niiso {
 					// TODO: rest of the packets lol
 					case 1:
 						out = "";
-						if ((parts[1] != "y" && parts[1] != "n") && we_ball(3)) {
-							if (we_ball(2)) out += "helo ";
+						if ((parts[1] != "y" && parts[1] != "n") && we_ball(10)) {
+							if (we_ball(8)) out += "helo ";
 							out += parts[3];
-							if (we_ball(5)) out += "er";
+							if (we_ball(6)) out += "er";
 							_send(out);
 						}
 						break;
