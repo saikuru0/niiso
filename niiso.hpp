@@ -185,7 +185,7 @@ class Niiso {
 				switch(std::stoi(parts[0])) {
 					// TODO: rest of the packets lol
 					case 1:
-						if (parts[1] == "y" || parts[1] == "n") break;
+						if (parts[1] == "y" || parts[1] == "n") { break; }
 						std::string msg = "";
 						if (we_ball(3)) {
 							if (we_ball(2)) msg += "helo ";
@@ -194,7 +194,6 @@ class Niiso {
 							_send(msg);
 						}
 						break;
-						
 					case 2:
 						std::cout << (parts[2] + ": " + parts[3] + "\n");
 						args = sockchat::segment(parts[3], ' ');
