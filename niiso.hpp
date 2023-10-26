@@ -48,8 +48,8 @@ class Niiso {
 			cmds[args[0]].handler(args);
 		}
 
-		bool we_ball(float ch) {
-			return ((static_cast<float>(rand()%1024) / 1024) < ch);
+		bool we_ball(int in) {
+			return (rand()%in == 0);
 		}
 
 	public:
@@ -187,10 +187,10 @@ class Niiso {
 					case 1:
 						if (parts[1] == "y" || parts[1] == "n") break;
 						std::string msg = "";
-						if (we_ball(0.3)) {
-							if (we_ball(0.5)) msg += "helo ";
+						if (we_ball(3)) {
+							if (we_ball(2)) msg += "helo ";
 							msg += parts[3];
-							if (we_ball(0.2)) msg += "er";
+							if (we_ball(5)) msg += "er";
 							_send(msg);
 						}
 						break;
