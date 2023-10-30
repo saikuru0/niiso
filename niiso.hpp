@@ -235,8 +235,7 @@ class Niiso {
 									break;
 								}
 							case 1:
-								uids[parts[5]] = parts[6];
-								std::cout << (parts[6] + ": " + parts[9] + "\n");
+								std::cout << (parts[5] + ": " + parts[8] + "\n");
 								break;
 							case 2:
 								break;
