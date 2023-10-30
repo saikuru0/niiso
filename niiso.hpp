@@ -230,8 +230,10 @@ class Niiso {
 					case 7:
 						switch(std::stoi(parts[1])) {
 							case 0:
-								uids[parts[4]] = parts[5];
-								break;
+								for (int i=0; i<std::stoi(parts[2]); i++) {
+									uids[parts[4+i*5]] = parts[5+i*5];
+									break;
+								}
 							case 1:
 								uids[parts[5]] = parts[6];
 								std::cout << (parts[6] + ": " + parts[9] + "\n");
