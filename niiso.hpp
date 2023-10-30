@@ -35,6 +35,7 @@ class Niiso {
 		};
 
 		std::map<std::string, Command> cmds;
+		std::map<std::string, std::string> uids;
 
 		void _send(std::string msg) {
 			q[1].push("2\t"+uid+"\t"+msg);
@@ -210,11 +211,25 @@ class Niiso {
 						}
 						break;
 					case 2:
-						std::cout << (parts[2] + ": " + parts[3] + "\n");
+						std::cout << (uids[parts[2]] + ": " + parts[3] + "\n");
 						args = sockchat::segment(parts[3], ' ');
 						if (args[0].at(0) == '^') run_cmd(args);
 						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos) run_cmd({"^one"});
 						break;
+					case 7:
+						switch(std::stoi(parts[1])) {
+							case 0:
+								uids[parts[4]] = parts[5];
+								break;
+							case 1:
+								uids[parts[5]] = parts[6];
+								std::cout << (parts[6] + ": " + parts[9] + "\n");
+								break;
+							case 2:
+								break;
+							default:
+								break;
+						}
 					default:
 						break;
 				}
