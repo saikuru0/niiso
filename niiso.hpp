@@ -232,8 +232,8 @@ class Niiso {
 							case 0:
 								for (int i=0; i<std::stoi(parts[2]); i++) {
 									uids[parts[3+i*5]] = parts[4+i*5];
-									break;
 								}
+								break;
 							case 1:
 								std::cout << (parts[5] + ": " + parts[8] + "\n");
 								break;
