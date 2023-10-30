@@ -231,7 +231,7 @@ class Niiso {
 						switch(std::stoi(parts[1])) {
 							case 0:
 								for (int i=0; i<std::stoi(parts[2]); i++) {
-									uids[parts[4+i*5]] = parts[5+i*5];
+									uids[parts[3+i*5]] = parts[4+i*5];
 									break;
 								}
 							case 1:
