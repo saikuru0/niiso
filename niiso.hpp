@@ -216,6 +216,17 @@ class Niiso {
 						if (args[0].at(0) == '^') run_cmd(args);
 						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos) run_cmd({"^one"});
 						break;
+					case 3:
+						if (parts[3] == "kick") { _send("admin abuse :random:"); }
+						if (parts[3] == "timeout") { _send("godspeed, miss dialup :evil:"); }
+						if (parts[3] == "flood") { _send("lmao macro"); }
+						if (parts[3] == "leave" && we_ball(3)) {
+							std::string msg("");
+							if (we_ball(2)) msg += "noooo "
+							msg += parts[2]; msg += " gone.."
+							if (we_ball(2)) msg += " :sob:"
+						}
+						break;
 					case 7:
 						switch(std::stoi(parts[1])) {
 							case 0:
