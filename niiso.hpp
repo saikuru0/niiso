@@ -155,7 +155,7 @@ class Niiso {
 				[this](const std::vector<std::string& args>) {
 					std::string symbols = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890";
 					int segments = 3+rand()%6;
-					std::string msg=""
+					std::string msg("");
 					for (int s=0; s<segments; s++) {
 						for (int c=0; c<5; c++) { msg += symbols[rand()%symbols.size()] }
 						if (s != segments-1) msg += "-";
