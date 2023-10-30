@@ -222,9 +222,9 @@ class Niiso {
 						if (parts[3] == "flood") { _send("lmao macro"); }
 						if (parts[3] == "leave" && we_ball(3)) {
 							std::string msg("");
-							if (we_ball(2)) msg += "noooo "
-							msg += parts[2]; msg += " gone.."
-							if (we_ball(2)) msg += " :sob:"
+							if (we_ball(2)) msg += "noooo ";
+							msg += parts[2]; msg += " gone..";
+							if (we_ball(2)) msg += " :sob:";
 						}
 						break;
 					case 7:
