@@ -204,6 +204,7 @@ class Niiso {
 					case 1:
 						out = "";
 						if ((parts[1] != "y" && parts[1] != "n") && we_ball(10)) {
+							uids[parts[3]] = parts[4];
 							if (we_ball(8)) out += "helo ";
 							out += parts[3];
 							if (we_ball(6)) out += "er";
@@ -235,7 +236,7 @@ class Niiso {
 								}
 								break;
 							case 1:
-								std::cout << (parts[5] + ": " + parts[8] + "\n");
+								std::cout << (parts[4] + ": " + parts[7] + "\n");
 								break;
 							case 2:
 								break;
