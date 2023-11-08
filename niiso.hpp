@@ -1,6 +1,8 @@
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <sstream>
+#include <functional>
 #include <queue>
 #include <map>
 
