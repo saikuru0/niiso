@@ -47,11 +47,11 @@ class Niiso {
 		}
 
 		std::string _rand_line(const std::vector<std::string>& lines) {
-			return (lines.at(lines.begin()+(rand()%lines.size())));
+			return lines[rand()%lines.size()];
 		}
 
 		std::string _rand_emote() {
-			return emotes.at(emotes.begin()+(rand()%emotes.size()));
+			return emotes[rand()%emotes.size()];
 		}
 
 		void run_cmd(std::vector<std::string> args) {
