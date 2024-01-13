@@ -38,9 +38,19 @@ class Niiso {
 
 		std::map<std::string, Command> cmds;
 		std::map<std::string, std::string> uids;
+		std::map<std::string, std::vector<std::string>> lines;
+		std::vector<std::string> emotes;
 
 		void _send(std::string msg) {
 			q[1].push("2\t"+uid+"\t"+msg);
+		}
+
+		std::string _rand_line(const std::vector<std::string>& lines) {
+			return (lines.at(lines.begin()+(rand()%lines.size())));
+		}
+
+		std::string _rand_emote() {
+			return emotes.at(emotes.begin()+(rand()%emotes.size()));
 		}
 
 		void run_cmd(std::vector<std::string> args) {
@@ -62,6 +72,129 @@ class Niiso {
 			this->auth = auth;
 			srand(time(NULL));
 
+			emotes = {
+				":sob:",
+				":random:",
+				":evil:",
+				":sunglasses:",
+				":pensive:",
+				":woomy:",
+				":random-pain:",
+				":pien:",
+				"xd",
+				"o-o"
+			};
+
+			lines["timeout"] = {
+				"uh oh",
+				"F interweb",
+				"farewell",
+				"bro why am i lagging",
+				"no mom please dont turn off my router plea",
+				"how",
+				"flasher should restart server",
+				"glad im hosted elsewhere",
+				"rip sister",
+				"mom no",
+				"pingn't",
+				"who died",
+				"godspeed, miss dialup"
+			};
+
+			lines["kick"] = {
+				"admin abuse",
+				"that's not nice",
+				"why",
+				"battlefield 4 experience",
+				"i got kicked once because someone made me spam a pyramid with echo",
+				"i got kicked in the past i think",
+				"what",
+				"what's the crime",
+				"power hungry",
+				"huh",
+				"damn",
+				"what happened",
+				"take cover"
+			};
+
+			lines["leave"] = {
+				"see u",
+				"gn",
+				"mata ne",
+				"ja ne",
+				"see ya l8r",
+				"cya",
+				"aw",
+				"catch u later",
+				"baibaiiiii",
+				"nighties",
+				"i hope it's brb"
+			};
+
+			lines["flood"] = {
+				"too many",
+				"too much letters",
+				"spambuster activate",
+				"thanks satori",
+				"good job",
+				"thanks protector of the realm",
+				"as long as it doesnt cover the entire chat",
+				"nice",
+				"it wasnt that much i think",
+				"meditation time"
+			};
+
+			lines["unauth"] = {
+				"no",
+				"why would i",
+				"i refuse",
+				"fuck no",
+				"nah",
+				"nuh uh",
+				"nope",
+				"don't even try",
+				"who are you to dictate that",
+				"yeahhh no",
+				"try contacting the owner",
+				"you tried"
+			};
+
+			lines["args_bad"] = {
+				"wrong args dummy",
+				"this won't work",
+				"i don't.. get it",
+				"i don't get it",
+				"i dont get it",
+				"huh",
+				"what",
+				"that's not how it works",
+				"idk that way to do this",
+				"idk how to do that lol"
+			};
+
+			lines["args_evil"] = {
+				"not even trying that",
+				"im not trying that",
+				"ye nah",
+				"are you trying to kill me",
+				"you're funny, funny guy",
+				"im not gonna do that",
+				"dont even try",
+				"stop",
+				"why",
+				"would you download a zip bomb"
+			};
+
+			lines["format"] = {
+				"wrong format, silly",
+				"u mistyped something",
+				"i think im dyslexic",
+				"i might be dyslexic",
+				"i cant read",
+				"i cant parse scottish",
+				"yeah coming right up (i have no idea what that says)"
+			};
+
 			cmds["^help"] = {
 				"help",
 				"displays available commands",
@@ -79,7 +212,12 @@ class Niiso {
 				"exit",
 				"exits the chat",
 				[this](const std::vector<std::string>& args) {
-					_send("lmao you thought");
+					if (we_ball(6)) {
+						std::string message(_rand_line(lines["unauth"]));
+						if (we_ball(3)) message += "?";
+						if (we_ball(3)) message += (" " + _rand_emote());
+						_send(message);
+					}
 				}
 			};
 
@@ -96,13 +234,21 @@ class Niiso {
 				"rolls the dice in your beloved format (ex. 1d6)",
 				[this](const std::vector<std::string>& args) {
 					if (args.size() != 2) {
-						_send("wrong args, dummy");
+						if(we_ball(6)) {
+							std::string message(_rand_line(lines["args_bad"]));
+							if (we_ball(3)) message += (" " + _rand_emote());
+							_send(message);
+						}
 						return;
 					}
 					try {
 						std::vector<std::string> dice = sockchat::segment(args[1], 'd');
 						if (dice.size() != 2) {
-							_send("how many 'd's did you use");
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["args_bad"]));
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
 							return;
 						}
 						int nums[2];
@@ -111,15 +257,29 @@ class Niiso {
 							nums[1] = std::stoi(dice[1]);
 						}
 						catch (const std::exception&) {
-							_send("how uhh... how many sides is that");
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["args_bad"]));
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
 							return;
 						}
 						if (nums[0] > 1000) {
-							_send("do you have a fucking 2k monitor set up vertically");
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["args_evil"]));
+								if (we_ball(3)) message += "?";
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
 							return;
 						}
 						if (nums[0] < 1 || nums[1] < 1) {
-							_send("how am i supposed to roll that");
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["args_evil"]));
+								if (we_ball(3)) message += "?";
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
 							return;
 						}
 						std::string msg("");
@@ -130,7 +290,11 @@ class Niiso {
 						_send(msg);
 					}
 					catch (const std::exception&) {
-						_send("wrong format, silly");
+						if(we_ball(6)) {
+							std::string message(_rand_line(lines["format"]));
+							if (we_ball(3)) message += (" " + _rand_emote());
+							_send(message);
+						}
 						return;
 					}
 				}
@@ -143,7 +307,12 @@ class Niiso {
 					std::string msg("");
 					for (int a=1; a<(int)args.size(); a++) {
 						if (args[a].at(0) == '!' || args[a].at(0) == '^') {
-							_send("xd");
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["args_evil"]));
+								if (we_ball(3)) message += "?";
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
 							return;
 						}
 						msg += (args[a]+" ");
@@ -217,17 +386,36 @@ class Niiso {
 						std::cout << (uids[parts[2]] + ": " + parts[3] + "\n");
 						args = sockchat::segment(parts[3], ' ');
 						if (args[0].at(0) == '^') run_cmd(args);
-						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos) run_cmd({"^one"});
+						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos && we_ball(6)) run_cmd({"^one"});
 						break;
 					case 3:
-						if (parts[3] == "kick") { _send("admin abuse :random:"); }
-						if (parts[3] == "timeout") { _send("godspeed, miss dialup :evil:"); }
-						if (parts[3] == "flood") { _send("lmao macro"); }
-						if (parts[3] == "leave" && we_ball(3)) {
-							std::string msg("");
-							if (we_ball(2)) msg += "noooo ";
-							msg += parts[2]; msg += " gone..";
-							if (we_ball(2)) msg += " :sob:";
+						if (parts[3] == "kick") {
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["kick"]));
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
+						}
+						if (parts[3] == "timeout") {
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["timeout"]));
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
+						}
+						if (parts[3] == "flood") {
+							if(we_ball(6)) {
+								std::string message(_rand_line(lines["flood"]));
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
+						}
+						if (parts[3] == "leave") {
+							if(we_ball(10)) {
+								std::string message(_rand_line(lines["leave"]));
+								if (we_ball(3)) message += (" " + _rand_emote());
+								_send(message);
+							}
 						}
 						break;
 					case 7:
