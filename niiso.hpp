@@ -1,6 +1,7 @@
 #include <iostream>
 #include <mutex>
 #include <string>
+#include <vector>
 #include <sstream>
 #include <functional>
 #include <queue>
