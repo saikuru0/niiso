@@ -7,6 +7,10 @@
 #include <queue>
 #include <map>
 
+#include <fstream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 namespace sockchat {
 	std::vector<std::string> segment(const std::string& input, const char delim) {
 		std::vector<std::string> parts;
@@ -27,7 +31,7 @@ namespace sockchat {
 
 class Niiso {
 	private:
-		std::string uri, uid, auth;
+		std::string uid, auth;
 		std::queue<std::string> q[2];
 		std::mutex q_mtx;
 
@@ -37,6 +41,21 @@ class Niiso {
 			std::function<void(const std::vector<std::string>&)> handler;
 		};
 
+		struct Config {
+			std::unordered_map<std::string, int> chances;
+			std::vector<std::string> admin_ids;
+			std::string user_id;
+			std::string auth_key;
+
+			void from_json(const json& j) {
+				j.at("chances").get_to(chances);
+				j.at("admin_ids").get_to(admin_ids);
+				j.at("user_id").get_to(user_id);
+				j.at("auth_key").get_to(auth_key);
+			}
+		};
+
+		Config config;
 		std::map<std::string, Command> cmds;
 		std::map<std::string, std::string> uids;
 		std::map<std::string, std::vector<std::string>> lines;
@@ -66,11 +85,41 @@ class Niiso {
 			return (rand()%in == 0);
 		}
 
+		void load_config(std::string fname) {
+			std::ifstream file(fname);
+			if (file.is_open()) {
+				json data = json::parse(file);
+				config.from_json(data);
+				file.close();
+			}
+			else {
+				json data;
+				data["chances"] = {
+					{ "timeout", 9 },
+					{ "kick", 9 },
+					{ "leave", 9 },
+					{ "flood", 9 },
+					{ "unauth", 9 },
+					{ "args_bad", 9 },
+					{ "args_evil", 9 },
+					{ "format", 9 },
+					{ "engie_one", 9 }
+				};
+				data["user_id"] = "USER_ID_STRING";
+				data["auth_key"] = "AUTH_KEY_STRING";
+				data["admin_ids"] = { "SOME_UID", "ANOTHER_UID" };
+				std::ofstream out_file(fname);
+				out_file << std::setw(4) << data << std::endl;
+				out_file.close();
+				load_config(fname);
+			}
+		}
+
 	public:
-		Niiso(std::string uri, std::string uid, std::string auth) {
-			this->uri = uri;
-			this->uid = uid;
-			this->auth = auth;
+		Niiso(std::string uid, std::string auth) {
+			load_config("niiso_config.json");
+			this->uid = config.user_id;
+			this->auth = config.auth_key;
 			srand(time(NULL));
 
 			emotes = {
@@ -213,7 +262,7 @@ class Niiso {
 				"exit",
 				"exits the chat",
 				[this](const std::vector<std::string>& args) {
-					if (we_ball(6)) {
+					if (we_ball(config.chances["unauth"])) {
 						std::string message(_rand_line(lines["unauth"]));
 						if (we_ball(3)) message += "?";
 						if (we_ball(3)) message += (" " + _rand_emote());
@@ -235,7 +284,7 @@ class Niiso {
 				"rolls the dice in your beloved format (ex. 1d6)",
 				[this](const std::vector<std::string>& args) {
 					if (args.size() != 2) {
-						if(we_ball(6)) {
+						if(we_ball(config.chances["args_bad"])) {
 							std::string message(_rand_line(lines["args_bad"]));
 							if (we_ball(3)) message += (" " + _rand_emote());
 							_send(message);
@@ -245,7 +294,7 @@ class Niiso {
 					try {
 						std::vector<std::string> dice = sockchat::segment(args[1], 'd');
 						if (dice.size() != 2) {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["args_bad"])) {
 								std::string message(_rand_line(lines["args_bad"]));
 								if (we_ball(3)) message += (" " + _rand_emote());
 								_send(message);
@@ -258,7 +307,7 @@ class Niiso {
 							nums[1] = std::stoi(dice[1]);
 						}
 						catch (const std::exception&) {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["args_bad"])) {
 								std::string message(_rand_line(lines["args_bad"]));
 								if (we_ball(3)) message += (" " + _rand_emote());
 								_send(message);
@@ -266,7 +315,7 @@ class Niiso {
 							return;
 						}
 						if (nums[0] > 1000) {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["args_evil"])) {
 								std::string message(_rand_line(lines["args_evil"]));
 								if (we_ball(3)) message += "?";
 								if (we_ball(3)) message += (" " + _rand_emote());
@@ -275,7 +324,7 @@ class Niiso {
 							return;
 						}
 						if (nums[0] < 1 || nums[1] < 1) {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["args_evil"])) {
 								std::string message(_rand_line(lines["args_evil"]));
 								if (we_ball(3)) message += "?";
 								if (we_ball(3)) message += (" " + _rand_emote());
@@ -291,7 +340,7 @@ class Niiso {
 						_send(msg);
 					}
 					catch (const std::exception&) {
-						if(we_ball(6)) {
+						if(we_ball(config.chances["format"])) {
 							std::string message(_rand_line(lines["format"]));
 							if (we_ball(3)) message += (" " + _rand_emote());
 							_send(message);
@@ -308,7 +357,7 @@ class Niiso {
 					std::string msg("");
 					for (int a=1; a<(int)args.size(); a++) {
 						if (args[a].at(0) == '!' || args[a].at(0) == '^') {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["args_evil"])) {
 								std::string message(_rand_line(lines["args_evil"]));
 								if (we_ball(3)) message += "?";
 								if (we_ball(3)) message += (" " + _rand_emote());
@@ -387,32 +436,32 @@ class Niiso {
 						std::cout << (uids[parts[2]] + ": " + parts[3] + "\n");
 						args = sockchat::segment(parts[3], ' ');
 						if (args[0].at(0) == '^') run_cmd(args);
-						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos && we_ball(6)) run_cmd({"^one"});
+						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos && we_ball(config.chances["engie_one"])) run_cmd({"^one"});
 						break;
 					case 3:
 						if (parts[3] == "kick") {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["kick"])) {
 								std::string message(_rand_line(lines["kick"]));
 								if (we_ball(3)) message += (" " + _rand_emote());
 								_send(message);
 							}
 						}
 						if (parts[3] == "timeout") {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["timeout"])) {
 								std::string message(_rand_line(lines["timeout"]));
 								if (we_ball(3)) message += (" " + _rand_emote());
 								_send(message);
 							}
 						}
 						if (parts[3] == "flood") {
-							if(we_ball(6)) {
+							if(we_ball(config.chances["flood"])) {
 								std::string message(_rand_line(lines["flood"]));
 								if (we_ball(3)) message += (" " + _rand_emote());
 								_send(message);
 							}
 						}
 						if (parts[3] == "leave") {
-							if(we_ball(10)) {
+							if(we_ball(config.chances["leave"])) {
 								std::string message(_rand_line(lines["leave"]));
 								if (we_ball(3)) message += (" " + _rand_emote());
 								_send(message);
