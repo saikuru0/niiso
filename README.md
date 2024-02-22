@@ -4,13 +4,13 @@
 
 ## Building
 
-You don't need any dependencies to build a project with Niiso. After all, its interface is two string queues. I do recommend using `-Wall` and `-std=c++11` though.
+~You don't need any dependencies to build a project with Niiso. After all,~ (now Niiso uses nlohmann's json library for its config) its interface is two string queues. I do recommend using `-Wall` and `-std=c++11` though.
 
 Here's an example minimal Makefile for a single-file project using Niiso:
 
 ```Makefile
 CC = g++
-CFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -std=c++11 -Iwhatever/path/in/which/theres/json/include
 LDFLAGS = 
 
 SRC = main.cpp
@@ -36,7 +36,7 @@ Niiso uses two string queues, one for what gets put into the bot for parsing and
 
 ### Connection
 
-Right now, the Niiso constructor takes the sockchat server `URI`, the bot user `UID` and the bot user `authkey` (the data string part of the authkey, "Misuzu" is handled by Niiso). The `URI` is leftover code from previous versions because websocket communication is not in Niiso's scope - a dummy string can be safely used instead.
+Right now, the Niiso constructor takes ~the sockchat server `URI`,~ (removed it) the bot user `UID` and the bot user `authkey` (the data string part of the authkey, "Misuzu" is handled by Niiso). The `URI` is leftover code from previous versions because websocket communication is not in Niiso's scope - a dummy string can be safely used instead.
 
 ### Interaction
 
