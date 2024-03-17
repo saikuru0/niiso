@@ -153,7 +153,7 @@ class Niiso {
 		}
 
 	public:
-		Niiso(std::string uid, std::string auth) {
+		Niiso() {
 			load_config("niiso_config.json");
 			this->uid = config.user_id;
 			this->auth = config.auth_key;
