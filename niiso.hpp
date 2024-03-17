@@ -17,13 +17,13 @@ using json = nlohmann::json;
 #include <stdexcept>
 
 std::string exec(const char* cmd) {
+	std::array<char, 128> buffer;
+	std::string result;
 	std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
 	if (!pipe) throw std::runtime_error("popen() failed in exec()");
-	std::string result;
-	char buffer[128];
 	while (!feof(pipe.get())) {
-		if (fgets(buffer, 128, pipe.get()) != nullptr)
-			result += buffer;
+		if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+			result += buffer.data();
 	}
 	return result;
 }
@@ -113,7 +113,7 @@ class Niiso {
 					cmd += url;
 					msg_out += exec(cmd.c_str());
 				}
-				send(msg_out);
+				_send(msg_out);
 			}
 		}
 
