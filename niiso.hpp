@@ -108,8 +108,11 @@ class Niiso {
 			}
 			if (urls.size() > 0) {
 				std::string msg_out("");
-				for (const auto& url : urls)
-					msg_out += exec((std::string("python3 eckser/main.py ") + url).c_str());
+				for (auto url : urls) {
+					std::string cmd("python3 eckser/main.py ");
+					cmd += url;
+					msg_out += exec(cmd.c_str());
+				}
 				send(msg_out);
 			}
 		}
