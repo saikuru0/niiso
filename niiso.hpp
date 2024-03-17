@@ -108,41 +108,33 @@ class Niiso {
 						return;
 					}
 
-					PyObject* pModule = PyImport_ImportModule("eckser/main");
+					FILE* file = fopen("eckser/main.py", "r");
 
-					if (!pModule) {
+					if (!file) {
 						Py_DECREF(pyArg);
 						Py_Finalize();
 						return;
 					}
 
-					PyObject* pFunc = PyObject_GetAttrString(pModule, "main");
+					PyObject* pModule = PyImport_AddModule("__main__");
+					PyObject* pDict = PyModule_GetDict(pModule);
+					PyObject* pValue = PyRun_File(file, "eckser/main.py", Py_file_input, pDict, pDict);
 
-					if (!pFunc || !PyCallable_Check(pFunc)) {
-						Py_DECREF(pyArg);
-						Py_XDECREF(pModule);
-						Py_XDECREF(pFunc);
-						Py_Finalize();
-						return;
-					}
+					fclose(file);
 
-					PyObject* pResult = PyObject_CallFunctionObjArgs(pFunc, pyArg, NULL);
-
-					if (!pResult) {
+					if (!pValue) {
 						Py_DECREF(pyArg);
 						Py_XDECREF(pModule);
-						Py_XDECREF(pFunc);
-						Py_XDECREF(pResult);
+						Py_XDECREF(pValue);
 						Py_Finalize();
 						return;
 					}
 
-					msg_out += PyUnicode_AsUTF8(pResult);
+					msg_out += PyUnicode_AsUTF8(pValue);
 
 					Py_DECREF(pyArg);
 					Py_XDECREF(pModule);
-					Py_XDECREF(pFunc);
-					Py_XDECREF(pResult);
+					Py_XDECREF(pValue);
 				}
 
 				Py_Finalize();
