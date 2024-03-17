@@ -11,6 +11,9 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include <regex>
+#include <Python.h>
+
 namespace sockchat {
 	std::vector<std::string> segment(const std::string& input, const char delim) {
 		std::vector<std::string> parts;
@@ -79,6 +82,73 @@ class Niiso {
 				return;
 			}
 			cmds[args[0]].handler(args);
+		}
+
+		void embed_twitter(std::string msg) {
+			std::regex post_regex("https://twitter.com/[a-zA-Z0-9_]+/status/[0-9]+");
+			std::smatch match;
+			std::vector<std::string> urls;
+			while (std::regex_search(msg, match, post_regex)) {
+				urls.push_back(match[0]);
+				msg = match.suffix().str();
+			}
+			if (urls.size() > 0) {
+				Py_Initialize();
+
+				if (!Py_IsInitialized())
+					return;
+
+				std::string msg_out;
+
+				for (const auto& arg : urls) {
+					PyObject* pyArg = Py_BuildValue("s", arg.c_str());
+
+					if (!pyArg) {
+						Py_Finalize();
+						return;
+					}
+
+					PyObject* pModule = PyImport_ImportModule("eckser/main");
+
+					if (!pModule) {
+						Py_DECREF(pyArg);
+						Py_Finalize();
+						return;
+					}
+
+					PyObject* pFunc = PyObject_GetAttrString(pModule, "main");
+
+					if (!pFunc || !PyCallable_Check(pFunc)) {
+						Py_DECREF(pyArg);
+						Py_XDECREF(pModule);
+						Py_XDECREF(pFunc);
+						Py_Finalize();
+						return;
+					}
+
+					PyObject* pResult = PyObject_CallFunctionObjArgs(pFunc, pyArg, NULL);
+
+					if (!pResult) {
+						Py_DECREF(pyArg);
+						Py_XDECREF(pModule);
+						Py_XDECREF(pFunc);
+						Py_XDECREF(pResult);
+						Py_Finalize();
+						return;
+					}
+
+					msg_out += PyUnicode_AsUTF8(pResult);
+
+					Py_DECREF(pyArg);
+					Py_XDECREF(pModule);
+					Py_XDECREF(pFunc);
+					Py_XDECREF(pResult);
+				}
+
+				Py_Finalize();
+
+				send(msg_out);
+			}
 		}
 
 		bool we_ball(int in) {
@@ -437,6 +507,7 @@ class Niiso {
 						args = sockchat::segment(parts[3], ' ');
 						if (args[0].at(0) == '^') run_cmd(args);
 						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos && we_ball(config.chances["engie_one"])) run_cmd({"^one"});
+						embed_twitter(parts[3]);
 						break;
 					case 3:
 						if (parts[3] == "kick") {
