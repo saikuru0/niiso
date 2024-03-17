@@ -12,7 +12,21 @@
 using json = nlohmann::json;
 
 #include <regex>
-#include <Python.h>
+#include <cstdio>
+#include <memory>
+#include <stdexcept>
+
+std::string exec(const char* cmd) {
+	std::array<char, 128> buffer;
+	std::string result;
+	std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+	if (!pipe) throw std::runtime_error("popen() failed in exec()");
+	while (!feof(pipe.get())) {
+		if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
+			result += buffer.data();
+	}
+	return result;
+}
 
 namespace sockchat {
 	std::vector<std::string> segment(const std::string& input, const char delim) {
@@ -93,52 +107,9 @@ class Niiso {
 				msg = match.suffix().str();
 			}
 			if (urls.size() > 0) {
-				Py_Initialize();
-
-				if (!Py_IsInitialized())
-					return;
-
-				std::string msg_out;
-
-				for (const auto& arg : urls) {
-					PyObject* pyArg = Py_BuildValue("s", arg.c_str());
-
-					if (!pyArg) {
-						Py_Finalize();
-						return;
-					}
-
-					FILE* file = fopen("eckser/main.py", "r");
-
-					if (!file) {
-						Py_DECREF(pyArg);
-						Py_Finalize();
-						return;
-					}
-
-					PyObject* pModule = PyImport_AddModule("__main__");
-					PyObject* pDict = PyModule_GetDict(pModule);
-					PyObject* pValue = PyRun_File(file, "eckser/main.py", Py_file_input, pDict, pDict);
-
-					fclose(file);
-
-					if (!pValue) {
-						Py_DECREF(pyArg);
-						Py_XDECREF(pModule);
-						Py_XDECREF(pValue);
-						Py_Finalize();
-						return;
-					}
-
-					msg_out += PyUnicode_AsUTF8(pValue);
-
-					Py_DECREF(pyArg);
-					Py_XDECREF(pModule);
-					Py_XDECREF(pValue);
-				}
-
-				Py_Finalize();
-
+				std::string msg_out("");
+				for (const auto& url : urls)
+					msg_out += exec((std::string("python eckser/main.py ") + url).c_str());
 				send(msg_out);
 			}
 		}
