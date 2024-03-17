@@ -102,13 +102,14 @@ class Niiso {
 			std::regex post_regex("https://twitter.com/[a-zA-Z0-9_]+/status/[0-9]+");
 			std::smatch match;
 			std::vector<std::string> urls;
-			while (std::regex_search(msg, match, post_regex)) {
+			auto start = msg.cbegin();
+			while (std::regex_search(start, msg.cend(), match, post_regex)) {
 				urls.push_back(match[0]);
-				msg = match.suffix().str();
+				start = match[0].second;
 			}
 			if (urls.size() > 0) {
 				std::string msg_out("");
-				for (auto url : urls) {
+				for (auto& url : urls) {
 					std::string cmd("python3 eckser/main.py ");
 					cmd += url;
 					msg_out += exec(cmd.c_str());
