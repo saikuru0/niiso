@@ -474,7 +474,7 @@ class Niiso {
 						args = sockchat::segment(parts[3], ' ');
 						if (args[0].at(0) == '^') run_cmd(args);
 						if (parts[2] == "186" && parts[3].find(": 1.") != std::string::npos && we_ball(config.chances["engie_one"])) run_cmd({"^one"});
-						embed_twitter(parts[3]);
+						if (parts[2] == "11") embed_twitter(parts[3]);
 						break;
 					case 3:
 						if (parts[3] == "kick") {
